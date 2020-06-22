@@ -18,8 +18,16 @@ async function requestDevice() {
     console.log('> Name:             ' + device.name);
     console.log('> Id:               ' + device.id);
 		console.log('> Connected:        ' + device.gatt.connected);
+		if (!device.gatt.connected) {
+			connectDevice();
+		}
   } catch(error)  {
     console.log('No! ' + error);
   }
 }
 
+async function connectDevice() {
+	console.log('Connecting to Bluetooth Device...');
+  await device.gatt.connect();
+  console.log('> Bluetooth Device connected');
+}
