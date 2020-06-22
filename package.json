@@ -1,0 +1,21 @@
+{
+    "name": "web-bluetooth-test",
+    "version": "0.1.0",
+    "description": "Web Bluetooth API test",
+    "homepage": "http://github.com/hisschemoller/web-bluetooth-test",
+    "license": "LGPL-3.0",
+    "private": true,
+    "main": "src/index.html",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://github.com/hisschemoller/web-bluetooth-test"
+    },
+    "author": "Wouter Hisschemoller",
+    "dependencies": {},
+    "devDependencies": {
+        "express": "^4.17.1"
+    }
+}
