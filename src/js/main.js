@@ -32,6 +32,14 @@ async function requestDevice() {
   }
 }
 
+async function getCharacteristics(service) {
+  console.log('Getting Characteristics...');
+  const characteristics = await service.getCharacteristics();
+  characteristics.forEach(characteristic => {
+    console.log('>> Characteristic: ' + characteristic.uuid, getSupportedProperties(characteristic));
+  });
+}
+
 async function connectDevice() {
 	console.log('Connecting to Bluetooth Device...');
   server = await device.gatt.connect();
@@ -54,11 +62,23 @@ function disconnectDevice() {
 }
 
 async function getService() {
+  console.log('Getting Services...');
   const services = await server.getPrimaryServices();
   console.log('> Bluetooth services', services);
   service = await server.getPrimaryService(bluetoothServiceUUID);
   console.log('> Bluetooth service', service);
-};
+  getCharacteristics(service);
+}
+
+function getSupportedProperties(characteristic) {
+  let supportedProperties = [];
+  for (const p in characteristic.properties) {
+    if (characteristic.properties[p] === true) {
+      supportedProperties.push(p.toUpperCase());
+    }
+  }
+  return '[' + supportedProperties.join(', ') + ']';
+}
 
 function onDisconnected(event) {
   // Object event.target is Bluetooth Device getting disconnected.
