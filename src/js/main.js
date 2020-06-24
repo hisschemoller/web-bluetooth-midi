@@ -32,14 +32,6 @@ async function requestDevice() {
   }
 }
 
-async function getCharacteristics(service) {
-  console.log('Getting Characteristics...');
-  const characteristics = await service.getCharacteristics();
-  characteristics.forEach(characteristic => {
-    console.log('>> Characteristic: ' + characteristic.uuid, getSupportedProperties(characteristic));
-  });
-}
-
 async function connectDevice() {
 	console.log('Connecting to Bluetooth Device...');
   server = await device.gatt.connect();
@@ -61,6 +53,30 @@ function disconnectDevice() {
   }
 }
 
+async function getCharacteristics(service) {
+  console.log('Getting Characteristics...');
+  const characteristics = await service.getCharacteristics();
+  characteristics.forEach(characteristic => {
+    // console.log('>> Characteristic: ', characteristic);
+    console.log('>> Characteristic.uuid: ', characteristic.uuid);
+    getCharacteristicProperties(characteristic);
+    getCharacteristicDescriptors(characteristic);
+  });
+}
+
+async function getCharacteristicDescriptors(characteristic) {
+  console.log('Getting Characteristic Descriptors...');
+  const descriptors = await characteristic.getDescriptors();
+  console.log('> Descriptors: ' + descriptors.map(c => c.uuid).join('\n' + ' '.repeat(19)));
+}
+
+function getCharacteristicProperties(characteristic) {
+  console.log('Getting Characteristic Properties...');
+  for (const p in characteristic.properties) {
+    console.log('> Property: ', p, characteristic.properties[p]);
+  }
+}
+
 async function getService() {
   console.log('Getting Services...');
   const services = await server.getPrimaryServices();
@@ -68,16 +84,6 @@ async function getService() {
   service = await server.getPrimaryService(bluetoothServiceUUID);
   console.log('> Bluetooth service', service);
   getCharacteristics(service);
-}
-
-function getSupportedProperties(characteristic) {
-  let supportedProperties = [];
-  for (const p in characteristic.properties) {
-    if (characteristic.properties[p] === true) {
-      supportedProperties.push(p.toUpperCase());
-    }
-  }
-  return '[' + supportedProperties.join(', ') + ']';
 }
 
 function onDisconnected(event) {
