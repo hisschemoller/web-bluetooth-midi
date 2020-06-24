@@ -67,6 +67,7 @@ async function getCharacteristics(service) {
     getCharacteristicProperties(characteristic);
     getCharacteristicDescriptors(characteristic);
     readCharacteristic(characteristic);
+    subscribeToNotifications(characteristic);
   });
   getDeviceInformation(characteristics);
 }
@@ -78,6 +79,19 @@ async function readCharacteristic(characteristic) {
       console.log('>>>>> Characteristic readValue: ', data.getUint8());
     });
   }
+}
+
+async function subscribeToNotifications(characteristic) {
+  console.log('>>>>> Characteristic notify: ', characteristic.properties.notify);
+  if (characteristic.properties.notify) {
+    await characteristic.startNotifications();
+    characteristic.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+  }
+}
+
+function onCharacteristicValueChanged(e) {
+  let value = `${e.target.value.getUint8(0)}:${e.target.value.getUint8(1)}:${e.target.value.getUint8(2)}`;
+  console.log('> Notification value: ', value);
 }
 
 async function getCharacteristicDescriptors(characteristic) {
