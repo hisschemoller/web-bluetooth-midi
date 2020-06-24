@@ -2,9 +2,17 @@
 const scanBtn = document.querySelector('.btn-scan');
 const disconnectBtn = document.querySelector('.btn-disconnect');
 const reconnectBtn = document.querySelector('.btn-reconnect');
+const readBtn = document.querySelector('.btn-read');
+const writeBtn = document.querySelector('.btn-write');
+const subscribeBtn = document.querySelector('.btn-subscribe');
+const unsubscribeBtn = document.querySelector('.btn-unsubscribe');
 scanBtn.addEventListener('click', requestDevice);
 disconnectBtn.addEventListener('click', disconnectDevice);
 reconnectBtn.addEventListener('click', reconnectDevice);
+readBtn.addEventListener('click', readCharacteristic);
+writeBtn.addEventListener('click', writeCharacteristic);
+subscribeBtn.addEventListener('click', subscribeToNotifications);
+unsubscribeBtn.addEventListener('click', unsubscribeFromNotifications);
 
 const bluetoothServiceUUID = '27cf08c1-076a-41af-becd-02ed6f6109b9';
 const valueToReportType = {
@@ -12,7 +20,7 @@ const valueToReportType = {
   2: 'Output Report',
   3: 'Feature Report'
 };
-let device, server, service;
+let device, server, service, characteristic;
 
 async function requestDevice() {
 	const options = { 
@@ -61,37 +69,16 @@ function disconnectDevice() {
 async function getCharacteristics(service) {
   console.log('Getting Characteristics...');
   const characteristics = await service.getCharacteristics();
-  characteristics.forEach(characteristic => {
-    console.log('>> Characteristic: ', characteristic);
-    console.log('>> Characteristic.uuid: ', characteristic.uuid);
-    getCharacteristicProperties(characteristic);
-    getCharacteristicDescriptors(characteristic);
-    readCharacteristic(characteristic);
-    subscribeToNotifications(characteristic);
-  });
+  // characteristics.forEach(characteristic => {});
+  // only one characteristic in this test case
+  characteristic = characteristics[0];
+  console.log('>> Characteristic: ', characteristic);
+  console.log('>> Characteristic.uuid: ', characteristic.uuid);
+  getCharacteristicProperties(characteristic);
+  getCharacteristicDescriptors(characteristic);
+  // readCharacteristic(characteristic);
+  // subscribeToNotifications(characteristic);
   getDeviceInformation(characteristics);
-}
-
-async function readCharacteristic(characteristic) {
-  console.log('>>>>> Characteristic readable: ', characteristic.properties.read);
-  if (characteristic.properties.read) {
-    characteristic.readValue().then(data => {
-      console.log('>>>>> Characteristic readValue: ', data.getUint8());
-    });
-  }
-}
-
-async function subscribeToNotifications(characteristic) {
-  console.log('>>>>> Characteristic notify: ', characteristic.properties.notify);
-  if (characteristic.properties.notify) {
-    await characteristic.startNotifications();
-    characteristic.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
-  }
-}
-
-function onCharacteristicValueChanged(e) {
-  let value = `${e.target.value.getUint8(0)}:${e.target.value.getUint8(1)}:${e.target.value.getUint8(2)}`;
-  console.log('> Notification value: ', value);
 }
 
 async function getCharacteristicDescriptors(characteristic) {
@@ -230,6 +217,11 @@ function onDisconnected(event) {
   console.log('> Bluetooth Device disconnected');
 }
 
+function onCharacteristicValueChanged(e) {
+  let value = `${e.target.value.getUint8(0)}:${e.target.value.getUint8(1)}:${e.target.value.getUint8(2)}`;
+  console.log('> Notification value: ', value);
+}
+
 function reconnectDevice() {
   if (!device) {
     return;
@@ -242,5 +234,41 @@ function reconnectDevice() {
     connectDevice();
   } catch(error) {
     console.log('Oh no! ' + error);
+  }
+}
+
+async function readCharacteristic() {
+  console.log('>>>>> Characteristic readable: ', characteristic.properties.read);
+  if (characteristic.properties.read) {
+    characteristic.readValue().then(data => {
+      console.log('>>>>> Characteristic readValue: ', data.getUint8());
+    });
+  }
+}
+
+async function subscribeToNotifications() {
+  console.log('>>>>> Characteristic notify: ', characteristic.properties.notify);
+  if (characteristic.properties.notify) {
+    console.log('Subscribing to notifications...');
+    await characteristic.startNotifications();
+    characteristic.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+  }
+}
+
+async function unsubscribeFromNotifications() {
+  console.log('Unsubscribing from notifications...');
+  await characteristic.stopNotifications();
+  characteristic.removeEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+}
+
+async function writeCharacteristic() {
+  console.log('>>>>> Characteristic writable: ', characteristic.properties.write);
+  if (characteristic.properties.write) {
+    let encoder = new TextEncoder('utf-8');
+    let value = 38; // document.querySelector('#description').value;
+    console.log('Characteristic writeValue...');
+    characteristic.writeValue(encoder.encode(value)).then(() => {
+      console.log('> Characteristic written to: ', value);
+    });
   }
 }
