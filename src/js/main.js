@@ -7,6 +7,11 @@ disconnectBtn.addEventListener('click', disconnectDevice);
 reconnectBtn.addEventListener('click', reconnectDevice);
 
 const bluetoothServiceUUID = '27cf08c1-076a-41af-becd-02ed6f6109b9';
+const valueToReportType = {
+  1: 'Input Report',
+  2: 'Output Report',
+  3: 'Feature Report'
+};
 let device, server, service;
 
 async function requestDevice() {
@@ -61,14 +66,54 @@ async function getCharacteristics(service) {
     console.log('>> Characteristic.uuid: ', characteristic.uuid);
     getCharacteristicProperties(characteristic);
     getCharacteristicDescriptors(characteristic);
+    readCharacteristic(characteristic);
   });
   getDeviceInformation(characteristics);
+}
+
+async function readCharacteristic(characteristic) {
+  console.log('>>>>> Characteristic readable: ', characteristic.properties.read);
+  if (characteristic.properties.read) {
+    characteristic.readValue().then(data => {
+      console.log('>>>>> Characteristic readValue: ', data.getUint8());
+    });
+  }
 }
 
 async function getCharacteristicDescriptors(characteristic) {
   console.log('Getting Characteristic Descriptors...');
   const descriptors = await characteristic.getDescriptors();
-  console.log('> Descriptors: ' + descriptors.map(c => c.uuid).join('\n' + ' '.repeat(19)));
+  for (const descriptor of descriptors) {
+    switch (descriptor.uuid) {
+
+      case BluetoothUUID.getDescriptor('gatt.client_characteristic_configuration'):
+        await descriptor.readValue().then(value => {
+          console.log('> Client Characteristic Configuration:');
+          let notificationsBit = value.getUint8(0) & 0b01;
+          console.log('  > Notifications: ' + (notificationsBit ? 'ON' : 'OFF'));
+          let indicationsBit = value.getUint8(0) & 0b10;
+          console.log('  > Indications: ' + (indicationsBit ? 'ON' : 'OFF'));
+        });
+        break;
+
+      case BluetoothUUID.getDescriptor('gatt.characteristic_user_description'):
+        await descriptor.readValue().then(value => {
+          let decoder = new TextDecoder('utf-8');
+          console.log('> Characteristic User Description: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getDescriptor('report_reference'):
+        await descriptor.readValue().then(value => {
+          console.log('> Report Reference:');
+          console.log('  > Report ID: ' + value.getUint8(0));
+          console.log('  > Report Type: ' + getReportType(value));
+        });
+        break;
+
+      default: console.log('> Unknown Descriptor: ' + descriptor.uuid);
+    }
+  }
 }
 
 function getCharacteristicProperties(characteristic) {
@@ -79,7 +124,7 @@ function getCharacteristicProperties(characteristic) {
 }
 
 async function getDeviceInformation(characteristics) {
-  console.log('Getting Device Information...');
+  console.log('Getting Device Information Characteristics...');
   const decoder = new TextDecoder('utf-8');
   for (const characteristic of characteristics) {
     switch (characteristic.uuid) {
@@ -150,6 +195,11 @@ async function getDeviceInformation(characteristics) {
       default: console.log('> Unknown Characteristic: ' + characteristic.uuid);
     }
   }
+}
+
+function getReportType(value) {
+  let v = value.getUint8(1);
+  return v + (v in valueToReportType ? ' (' + valueToReportType[v] + ')' : 'Unknown');
 }
 
 async function getService() {
