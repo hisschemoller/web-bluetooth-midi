@@ -57,11 +57,12 @@ async function getCharacteristics(service) {
   console.log('Getting Characteristics...');
   const characteristics = await service.getCharacteristics();
   characteristics.forEach(characteristic => {
-    // console.log('>> Characteristic: ', characteristic);
+    console.log('>> Characteristic: ', characteristic);
     console.log('>> Characteristic.uuid: ', characteristic.uuid);
     getCharacteristicProperties(characteristic);
     getCharacteristicDescriptors(characteristic);
   });
+  getDeviceInformation(characteristics);
 }
 
 async function getCharacteristicDescriptors(characteristic) {
@@ -74,6 +75,80 @@ function getCharacteristicProperties(characteristic) {
   console.log('Getting Characteristic Properties...');
   for (const p in characteristic.properties) {
     console.log('> Property: ', p, characteristic.properties[p]);
+  }
+}
+
+async function getDeviceInformation(characteristics) {
+  console.log('Getting Device Information...');
+  const decoder = new TextDecoder('utf-8');
+  for (const characteristic of characteristics) {
+    switch (characteristic.uuid) {
+
+      case BluetoothUUID.getCharacteristic('manufacturer_name_string'):
+        await characteristic.readValue().then(value => {
+          console.log('> Manufacturer Name String: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('model_number_string'):
+        await characteristic.readValue().then(value => {
+          console.log('> Model Number String: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('hardware_revision_string'):
+        await characteristic.readValue().then(value => {
+          console.log('> Hardware Revision String: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('firmware_revision_string'):
+        await characteristic.readValue().then(value => {
+          console.log('> Firmware Revision String: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('software_revision_string'):
+        await characteristic.readValue().then(value => {
+          console.log('> Software Revision String: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('system_id'):
+        await characteristic.readValue().then(value => {
+          console.log('> System ID: ');
+          console.log('  > Manufacturer Identifier: ' +
+              padHex(value.getUint8(4)) + padHex(value.getUint8(3)) +
+              padHex(value.getUint8(2)) + padHex(value.getUint8(1)) +
+              padHex(value.getUint8(0)));
+          console.log('  > Organizationally Unique Identifier: ' +
+              padHex(value.getUint8(7)) + padHex(value.getUint8(6)) +
+              padHex(value.getUint8(5)));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('ieee_11073-20601_regulatory_certification_data_list'):
+        await characteristic.readValue().then(value => {
+          console.log('> IEEE 11073-20601 Regulatory Certification Data List: ' + decoder.decode(value));
+        });
+        break;
+
+      case BluetoothUUID.getCharacteristic('pnp_id'):
+        await characteristic.readValue().then(value => {
+          console.log('> PnP ID:');
+          console.log('  > Vendor ID Source: ' + (value.getUint8(0) === 1 ? 'Bluetooth' : 'USB'));
+          if (value.getUint8(0) === 1) {
+            console.log('  > Vendor ID: ' + (value.getUint8(1) | value.getUint8(2) << 8));
+          } else {
+            console.log('  > Vendor ID: ' + getUsbVendorName(value.getUint8(1) | value.getUint8(2) << 8));
+          }
+          console.log('  > Product ID: ' + (value.getUint8(3) | value.getUint8(4) << 8));
+          console.log('  > Product Version: ' + (value.getUint8(5) | value.getUint8(6) << 8));
+        });
+        break;
+
+      default: console.log('> Unknown Characteristic: ' + characteristic.uuid);
+    }
   }
 }
 
