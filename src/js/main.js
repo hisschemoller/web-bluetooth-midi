@@ -1,11 +1,11 @@
 
-const scanBtn = document.querySelector('.btn-scan');
-const disconnectBtn = document.querySelector('.btn-disconnect');
-const reconnectBtn = document.querySelector('.btn-reconnect');
-const readBtn = document.querySelector('.btn-read');
-const writeBtn = document.querySelector('.btn-write');
-const subscribeBtn = document.querySelector('.btn-subscribe');
-const unsubscribeBtn = document.querySelector('.btn-unsubscribe');
+const scanBtn = document.querySelector('.app-test .btn-scan');
+const disconnectBtn = document.querySelector('.app-test .btn-disconnect');
+const reconnectBtn = document.querySelector('.app-test .btn-reconnect');
+const readBtn = document.querySelector('.app-test .btn-read');
+const writeBtn = document.querySelector('.app-test .btn-write');
+const subscribeBtn = document.querySelector('.app-test .btn-subscribe');
+const unsubscribeBtn = document.querySelector('.app-test .btn-unsubscribe');
 scanBtn.addEventListener('click', requestDevice);
 disconnectBtn.addEventListener('click', disconnectDevice);
 reconnectBtn.addEventListener('click', reconnectDevice);
@@ -14,7 +14,8 @@ writeBtn.addEventListener('click', writeCharacteristic);
 subscribeBtn.addEventListener('click', subscribeToNotifications);
 unsubscribeBtn.addEventListener('click', unsubscribeFromNotifications);
 
-const bluetoothServiceUUID = '27cf08c1-076a-41af-becd-02ed6f6109b9';
+// bleno test const bluetoothServiceUUID = '27cf08c1-076a-41af-becd-02ed6f6109b9';
+const bluetoothServiceUUID = '03b80e5a-ede8-4b33-a751-6ce34ec4c700';
 const valueToReportType = {
   1: 'Input Report',
   2: 'Output Report',
@@ -25,7 +26,7 @@ let device, server, service, characteristic;
 async function requestDevice() {
 	const options = { 
 		filters: [{
-			namePrefix: 'BlenoService',
+			namePrefix: 'BlenoService_',
     }],
     optionalServices: [ bluetoothServiceUUID ],
   };

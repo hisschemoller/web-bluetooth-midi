@@ -1,4 +1,10 @@
 # web-bluetooth-test
+
+- Scan for BLE peripheral devices that have the MIDI service UUID.
+- Once selected subscribe to the notifications.
+- Wait for incoming notifications that should be 5 bit timestamped MIDI messages.
+
+
 Web Bluetooth API test.
 
 - Web Bluetooth
