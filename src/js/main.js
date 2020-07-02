@@ -1,3 +1,4 @@
+import { playNote, setup as setupAudio } from './audio.js';
 
 const scanBtn = document.querySelector('.app-test .btn-scan');
 const disconnectBtn = document.querySelector('.app-test .btn-disconnect');
@@ -24,6 +25,8 @@ const valueToReportType = {
 let device, server, service, characteristic;
 
 async function requestDevice() {
+  setupAudio();
+
 	const options = { 
 		filters: [{
 			namePrefix: 'BlenoService_',
@@ -219,8 +222,10 @@ function onDisconnected(event) {
 }
 
 function onCharacteristicValueChanged(e) {
-  let value = `${e.target.value.getUint8(0)}:${e.target.value.getUint8(1)}:${e.target.value.getUint8(2)}`;
-  console.log('> Notification value: ', value);
+  const { value } = e.target;
+  let str = `${value.getUint8(0)}:${value.getUint8(1)}:${value.getUint8(2)}:${value.getUint8(3)}:${value.getUint8(4)}`;
+  console.log('> Notification value: ', str);
+  playNote(0, value.getUint8(2), value.getUint8(3), value.getUint8(4));
 }
 
 function reconnectDevice() {
