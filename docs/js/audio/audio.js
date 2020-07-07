@@ -50,17 +50,17 @@ function handleMIDI(state) {
  * @param {Event} e Custom event.
  */
 function handleStateChanges(e) {
-  const { state, action, actions, } = e.detail;
-  switch (action.type) {
+	const { state, action, actions, } = e.detail;
+	switch (action.type) {
 
-    case actions.BLUETOOTH_CONNECT:
-      initialiseAudio();
-      break;
+		case actions.BLUETOOTH_CONNECT:
+			initialiseAudio();
+			break;
 
 		case actions.HANDLE_MIDI_MESSAGE:
 			handleMIDI(state);
 			break;
-  }
+	}
 }
 
 /**
@@ -78,44 +78,10 @@ function initialiseAudio() {
  * @return {Number} Frequency (Hz)
  */
 function mtof(midi) {
-		if (midi <= -1500) return 0;
-		else if (midi > 1499) return 3.282417553401589e+38;
-		else return 440.0 * Math.pow(2, (Math.floor(midi) - 69) / 12.0);
+	if (midi <= -1500) return 0;
+	else if (midi > 1499) return 3.282417553401589e+38;
+	else return 440.0 * Math.pow(2, (Math.floor(midi) - 69) / 12.0);
 };
-
-// export function playNote(nowToStartInSecs, type, pitch, velocity) {
-// 	switch (type) {
-// 		case NOTE_ON:
-// 			startNote(nowToStartInSecs, pitch, velocity);
-// 			break;
-// 		case NOTE_OFF:
-// 			stopNote(nowToStartInSecs, pitch, velocity);
-// 			break;
-// 	}
-// }
-
-// export function playSound(nowToStartInSecs, bufferId, pitch, velocity) {
-	
-//   const startTime = audioCtx.currentTime + nowToStartInSecs;
-//   const voice = voices[voiceIndex];
-//   voiceIndex = ++voiceIndex % numVoices;
-
-//   if (voice.isPlaying) {
-//     console.log('isPlaying');
-//     voice.source.stop();
-//   }
-
-//   voice.isPlaying = true;
-//   voice.gain.gain.setValueAtTime(velocity / 127, startTime);
-//   voice.source = audioCtx.createBufferSource();
-//   voice.source.buffer = buffers.byId[bufferId].buffer;
-//   voice.source.playbackRate.setValueAtTime(2 ** ((pitch - 60) / 12), startTime);
-//   voice.source.connect(voice.gain);
-//   voice.source.start(startTime);
-//   voice.source.onended = function() {
-//     voice.isPlaying = false;
-//   }
-// }
 
 /**
  * Setup at app start.
@@ -134,15 +100,15 @@ function startNote(nowToStartInSecs, pitch, velocity) {
 	stopNote(0, pitch, velocity);
 
 	const startTime = audioCtx.currentTime + nowToStartInSecs;
-  const voice = voices[voiceIndex];
+	const voice = voices[voiceIndex];
 	voiceIndex = ++voiceIndex % numVoices;
 	
 	voice.isPlaying = true;
 	voice.osc = audioCtx.createOscillator();
 	voice.osc.type = 'sine';
 	voice.osc.frequency.setValueAtTime(mtof(pitch), startTime);
-  voice.osc.connect(voice.gain);
-  voice.osc.start(startTime);
+	voice.osc.connect(voice.gain);
+	voice.osc.start(startTime);
 	voice.gain.gain.setValueAtTime(velocity / 127, startTime);
 
 	pitches[pitch] = voice;

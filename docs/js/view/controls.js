@@ -5,7 +5,7 @@ const connectBtn = rootEl.querySelector('.btn-connect');
 const messageEl = rootEl.querySelector('.ble-status');
 
 /**
- * 
+ * Add event listeners.
  */
 function addEventListeners() {
   const actions = getActions();
