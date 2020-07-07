@@ -2,7 +2,7 @@ const express = require('express');
 
 const app = express();
 const port = process.env.PORT || 3013;
-const rootDir = process.argv[2] || 'src';
+const rootDir = process.argv[2] || 'docs';
 
 // Set public folder as root
 app.use(express.static(rootDir));
