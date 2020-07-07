@@ -21,6 +21,7 @@ async function connect() {
 		device = await navigator.bluetooth.requestDevice(options);
 		device.addEventListener('gattserverdisconnected', e => {
       console.log('bluetooth device disconnected');
+      dispatch(getActions().bluetoothDisconnect());
     });
     console.log('> bluetooth device found');
 		if (!device.gatt.connected) {
@@ -37,10 +38,12 @@ async function connect() {
         await characteristic.startNotifications();
         console.log('> bluetooth subscribed to notifications');
         characteristic.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+        dispatch(getActions().bluetoothSuccess());
       }
 		}
   } catch (error)  {
     console.log('bluetooth error: ', error);
+    dispatch(getActions().bluetoothError());
   }
 }
 
@@ -52,7 +55,7 @@ function handleStateChanges(e) {
   const { state, action, actions, } = e.detail;
   switch (action.type) {
 
-    case actions.CONNECT_BLUETOOTH:
+    case actions.BLUETOOTH_CONNECT:
       connect();
       break;
   }

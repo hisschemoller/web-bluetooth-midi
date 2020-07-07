@@ -53,7 +53,7 @@ function handleStateChanges(e) {
   const { state, action, actions, } = e.detail;
   switch (action.type) {
 
-    case actions.CONNECT_BLUETOOTH:
+    case actions.BLUETOOTH_CONNECT:
       initialiseAudio();
       break;
 

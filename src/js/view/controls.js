@@ -2,14 +2,18 @@ import { dispatch, getActions, getState, STATE_CHANGE, } from '../store/store.js
 
 const rootEl = document.querySelector('#controls');
 const connectBtn = rootEl.querySelector('.btn-connect');
+const messageEl = rootEl.querySelector('.ble-status');
 
+/**
+ * 
+ */
 function addEventListeners() {
   const actions = getActions();
 
   document.addEventListener(STATE_CHANGE, handleStateChanges);
   
   connectBtn.addEventListener('click', e => {
-    dispatch(actions.connectBluetooth());
+    dispatch(actions.bluetoothConnect());
   });
   document.addEventListener('keydown', e => {
 
@@ -33,7 +37,24 @@ function addEventListeners() {
 function handleStateChanges(e) {
   const { state, action, actions, } = e.detail;
   switch (action.type) {
-    case actions.ACTION:
+
+    case actions.BLUETOOTH_CONNECT:
+      messageEl.textContent = 'Connecting...';
+      connectBtn.setAttribute('disabled', 'disabled');
+      break;
+
+    case actions.BLUETOOTH_DISCONNECT:
+      messageEl.textContent = 'Bluetooth disconnected.';
+      connectBtn.removeAttribute('disabled');
+      break;
+
+    case actions.BLUETOOTH_ERROR:
+      messageEl.textContent = 'Bluetooth error!';
+      connectBtn.removeAttribute('disabled');
+      break;
+      
+    case actions.BLUETOOTH_SUCCESS:
+      messageEl.textContent = 'Bluetooth connected!';
       break;
   }
 }
