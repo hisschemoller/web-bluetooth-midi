@@ -64,13 +64,11 @@ function handleStateChanges(e) {
  */
 function onCharacteristicValueChanged(e) {
   const { value } = e.target;
-  let str = `${value.getUint8(0)}:${value.getUint8(1)}:${value.getUint8(2)}:${value.getUint8(3)}:${value.getUint8(4)}`;
-  console.log('>> notification value: ', str);
-  playNote(0, value.getUint8(2), value.getUint8(3), value.getUint8(4));
+  dispatch(getActions().handleMIDIMessage(value.getUint8(2), value.getUint8(3), value.getUint8(4)));
 }
 
 /**
- * Module setup.
+ * Module setup at app start.
  */
 export function setup() {
   addEventListeners();
