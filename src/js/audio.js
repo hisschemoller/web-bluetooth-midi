@@ -91,6 +91,7 @@ function startNote(nowToStartInSecs, pitch, velocity) {
 function stopNote(nowToStopInSecs, pitch, velocity) {
 	if (pitches[pitch]) {
 		pitches[pitch].osc.stop(nowToStopInSecs);
+		pitches[pitch].isPlaying = false;
 		pitches[pitch] = null;
 	}
 }

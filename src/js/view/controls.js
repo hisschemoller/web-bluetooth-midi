@@ -1,9 +1,9 @@
 import { dispatch, getActions, getState, STATE_CHANGE, } from '../store/store.js';
 
 const rootEl = document.querySelector('#controls');
-const scanBtn = document.querySelector('#controls .btn-scan');
-const disconnectBtn = document.querySelector('#controls .btn-disconnect');
-const reconnectBtn = document.querySelector('#controls .btn-reconnect');
+const scanBtn = rootEl.querySelector('.btn-scan');
+const disconnectBtn = rootEl.querySelector('.btn-disconnect');
+const reconnectBtn = rootEl.querySelector('.btn-reconnect');
 const readBtn = document.querySelector('#controls .btn-read');
 const writeBtn = document.querySelector('#controls .btn-write');
 const subscribeBtn = document.querySelector('#controls .btn-subscribe');
@@ -20,14 +20,14 @@ function addEventListeners() {
   document.addEventListener(STATE_CHANGE, handleStateChanges);
   
   scanBtn.addEventListener('click', e => {
-    dispatch(actions.setBluetoothState(REQUEST_DEVICE));
+    dispatch(actions.connectBluetooth());
   });
-  disconnectBtn.addEventListener('click', disconnectDevice);
-  reconnectBtn.addEventListener('click', reconnectDevice);
-  readBtn.addEventListener('click', readCharacteristic);
-  writeBtn.addEventListener('click', writeCharacteristic);
-  subscribeBtn.addEventListener('click', subscribeToNotifications);
-  unsubscribeBtn.addEventListener('click', unsubscribeFromNotifications);
+  // disconnectBtn.addEventListener('click', disconnectDevice);
+  // reconnectBtn.addEventListener('click', reconnectDevice);
+  // readBtn.addEventListener('click', readCharacteristic);
+  // writeBtn.addEventListener('click', writeCharacteristic);
+  // subscribeBtn.addEventListener('click', subscribeToNotifications);
+  // unsubscribeBtn.addEventListener('click', unsubscribeFromNotifications);
   document.addEventListener('keydown', e => {
 
     // don't perform shortcuts while typing in a text input.
