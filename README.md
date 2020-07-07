@@ -1,11 +1,21 @@
 # web-bluetooth-test
 
+Demo at https://hisschemoller.github.io/web-bluetooth-midi/
+
+An app to test MIDI over Bluetooth in JavaScript.
+
 - Scan for BLE peripheral devices that have the MIDI service UUID.
 - Once selected subscribe to the notifications.
 - Wait for incoming notifications that should be 5 bit timestamped MIDI messages.
+- Play sine wave sound using MIDI pitch and velocity.
+- Visual feedback of pitch and velocity.
 
+Uses
 
-Web Bluetooth API test.
+- Web Bluetooth API
+- Web Audio API
+
+Web Bluetooth documentation:
 
 - Web Bluetooth
   - https://webbluetoothcg.github.io/web-bluetooth/
